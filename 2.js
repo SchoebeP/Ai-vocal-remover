@@ -1,6 +1,6 @@
 /* PLEASE DO NOT COPY AND PASTE THIS CODE. */
 (function () {
-    var w = window,C = '___grecaptcha_cfg', cfg = w[C] = w[C] || {}, N = 'grecaptcha';
+    var w = window, C = '___grecaptcha_cfg', cfg = w[C] = w[C] || {}, N = 'grecaptcha';
     var E = 'enterprise', a = w[N] = w[N] || {}, gr = a[E] = a[E] || {};
     gr.ready = gr.ready || function (f) {
         (cfg['fns'] = cfg['fns'] || []).push(f);
