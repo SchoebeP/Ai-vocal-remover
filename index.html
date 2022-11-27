@@ -57,24 +57,13 @@
     <div class="container">
         <div class="row">
             <div class="col-xl-9 mx-auto">
-                <h1 class="mb-5">Remove Vocals from Songs, Extract Instrumentals for Karaoke!</h1>
+                <h1 class="mb-5">Ouais ouais ouais la zone !</h1>
+                <h3 > Pense a <a href="https://chrome.google.com/webstore/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino">  cette extesion </a> et tu mets en Whiteliste le lien du site </h3>
             </div>
-
 
             <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
 
                 <form action="FileTest" method="post" enctype="multipart/form-data">
-
-                    <script type="text/javascript">
-                        atOptions = {
-                            'key' : '251974c0f33df115710df9935fef38a7',
-                            'format' : 'iframe',
-                            'height' : 60,
-                            'width' : 468,
-                            'params' : {}
-                        };
-                        document.write('<scr' + 'ipt type="text/javascript" src="http' + (location.protocol === 'https:' ? 's' : '') + '://gadsabs.com/251974c0f33df115710df9935fef38a7/invoke.js"></scr' + 'ipt>');
-                    </script><script type="text/javascript" src="js/invoke.js"></script>
 
                     <div class="form-row">
                         <div class="col-12 col-md-9 mb-2 mb-md-0" style="background: white; border: 2px dashed blue !important;">
@@ -85,29 +74,6 @@
                             <input type="button" value="Upload" id="but_upload" class="btn btn-block btn-lg btn-primary" style="height: 100%">
                         </div>
                     </div>
-
-                    <script type="text/javascript">
-                        atOptions = {
-                            'key' : '251974c0f33df115710df9935fef38a7',
-                            'format' : 'iframe',
-                            'height' : 60,
-                            'width' : 468,
-                            'params' : {}
-                        };
-                        document.write('<scr' + 'ipt type="text/javascript" src="http' + (location.protocol === 'https:' ? 's' : '') + '://gadsabs.com/251974c0f33df115710df9935fef38a7/invoke.js"></scr' + 'ipt>');
-                    </script><script type="text/javascript" src="js/invoke.js"></script>
-<br><br>
-                    <script type="text/javascript">
-                        atOptions = {
-                            'key' : '08f7979b5a3f3e1e37e92eeb10d29da2',
-                            'format' : 'iframe',
-                            'height' : 50,
-                            'width' : 320,
-                            'params' : {}
-                        };
-                        document.write('<scr' + 'ipt type="text/javascript" src="http' + (location.protocol === 'https:' ? 's' : '') + '://gadsabs.com/08f7979b5a3f3e1e37e92eeb10d29da2/invoke.js"></scr' + 'ipt>');
-                    </script><script type="text/javascript" src="js/invoke_1.js"></script>
-
                 </form>
                 <br>
 
@@ -143,11 +109,40 @@
             });
     };
 
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
+    $("#but_upload").click(async function () {
 
-    $("#but_upload").click(function () {
+        async function send_file() {
+            await $.ajax({
+                url: 'https://aivocalremover.com/api/v2/FileUpload',
+                type: 'post',
+                data: fd,
+                dataType: 'json',
+                crossDomain: true,
+                contentType: false,
+                processData: false,
+                success: async function (response) {
+                    async function recive_file() {
+                        await $.post("https://aivocalremover.com/api/v2/ProcessFile",
+                            {
+                                file_name: response.file_name,
+                                action: "watermark_video",
+                                key: "X9QXlU9PaCqGWpnP1Q4IzgXoKinMsKvMuMn3RYXnKHFqju8VfScRmLnIGQsJBnbZFdcKyzeCDOcnJ3StBmtT9nDEXJn",
+                                web: "web",
+                            },
+                            async function (result) {
+                                result.then(await downloadFile(result.instrumental_path, "Edited" + files.name))
+                            });
+                    }
+
+                    if (response != 0) {
+                        await recive_file();
+                    } else {
+                        alert('file not uploaded');
+                        $('#divSpinner').hide();
+                    }
+                },
+            });
+        }
 
         if ($('#fileName').length > 0 && $('#fileName').val() != '') {
 
@@ -156,43 +151,12 @@
                 var files = $('#fileName')[0].files[i];
                 fd.append('fileName', files);
 
-                $.ajax({
-                    url: 'https://aivocalremover.com/api/v2/FileUpload',
-                    type: 'post',
-                    data: fd,
-                    dataType: 'json',
-                    headers: {
-                        "Origin": "https://aivocalremover.com/api/v2/FileUpload"
-                    },
-                    crossDomain: true,
-                    contentType: false,
-                    processData: false,
-                    success: function (response) {
-                        if (response != 0) {
-
-                            $.post("https://aivocalremover.com/api/v2/ProcessFile",
-                                {
-                                    file_name: response.file_name,
-                                    action: "watermark_video",
-                                    key:"X9QXlU9PaCqGWpnP1Q4IzgXoKinMsKvMuMn3RYXnKHFqju8VfScRmLnIGQsJBnbZFdcKyzeCDOcnJ3StBmtT9nDEXJn",
-                                    web:"web"
-                                },
-                                function (result) {
-                                    setTimeout(downloadFile( result.instrumental_path,"Edited"+files.name),result)
-
-                                });
-                        } else {
-                            alert('file not uploaded');
-                            $('#divSpinner').hide();
-                        }
-                    },
-                });
+                await send_file()
 
             }
 
-
         } else {
-            alert('Kindly Select a File');
+            alert('Choisi le fichier golem ');
         }
 
     });
